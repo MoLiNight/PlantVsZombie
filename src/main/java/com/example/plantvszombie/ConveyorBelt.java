@@ -76,7 +76,7 @@ public class ConveyorBelt {
             imageView.setImage(images[0]);
         }
         else
-            if(rand<55){
+            if(rand<85){
                 imageView.setImage(images[1]);
             }
             else{

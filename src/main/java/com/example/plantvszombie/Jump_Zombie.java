@@ -307,6 +307,8 @@ public class Jump_Zombie extends Zom{
                         alive = false;
                     }else if(die_reason == 2){
                         imageView.setImage(image_die);
+                        imageView.setFitWidth(120);
+                        imageView.setFitHeight(145);
                         alive = false;
                         try {
                             Thread.sleep(500);  // 暂停执行 5 秒钟（5000 毫秒）
