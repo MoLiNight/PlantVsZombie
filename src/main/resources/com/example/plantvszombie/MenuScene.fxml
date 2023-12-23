@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.plantvszombie.myController.MenuScene">
+   <children>
+      <ImageView fx:id="menuImage" fitHeight="600.0" fitWidth="800.0" pickOnBounds="true" preserveRatio="true" />
+      <Button fx:id="startButton" layoutX="245.0" layoutY="545.0" mnemonicParsing="false" onAction="#GameStart" opacity="0" prefHeight="30.0" prefWidth="305.0" />
+   </children>
+</AnchorPane>

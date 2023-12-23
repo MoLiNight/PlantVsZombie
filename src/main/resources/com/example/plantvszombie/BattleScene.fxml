@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="gameStage" prefHeight="600.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.plantvszombie.myController.BattleScene">
+   <children>
+      <ImageView fx:id="backgroundImage" fitHeight="600.0" fitWidth="1400.0" layoutX="-100" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/Grass.jpg" />
+         </image></ImageView>
+      <ImageView fx:id="shovelBackground" fitHeight="82.0" fitWidth="82.0" layoutX="800.0" pickOnBounds="true">
+         <image>
+            <Image url="@../../../images/Card_Background.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="shovelImage" fitHeight="40.0" fitWidth="60.0" layoutX="811.0" layoutY="21.0" pickOnBounds="true" rotate="315.0">
+         <image>
+            <Image url="@../../../images/Shovel.png" />
+         </image>
+      </ImageView>
+      <Pane fx:id="beltPane" layoutX="200.0" prefHeight="82.0" prefWidth="580.0" />
+      <Button fx:id="menuButton" layoutX="900.0" layoutY="5.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" text="Exit" textAlignment="CENTER" textFill="#55ff00">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font></Button>
+      <ImageView fx:id="startAnimation" fitHeight="150.0" fitWidth="200.0" layoutX="400.0" layoutY="200.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../images/ReadyToStart.gif" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>
