@@ -57,9 +57,9 @@ public class BattleScene {
 
     int card_id=0;
     private Connection connection;
-
     int zoms_num=0;
     Zom[] zoms=new Zom[1000];
+    boolean GameEnded=false;
 
     public void initialize() throws SQLException {
         connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/GameDB?useSSL=false","root","Zxx20040806*");
@@ -127,10 +127,11 @@ public class BattleScene {
                         };
                         viewTimer.schedule(viewTask,0,100);
 
+                        GameEnded=true;
                         resultTimer.cancel();
                     }
                     else{
-                        if(zoms_num>=100){
+                        if(zoms_num>=1){
                             preparedStatement=connection.prepareStatement("SELECT * FROM zombie_data",Statement.RETURN_GENERATED_KEYS);
                             preparedStatement.executeQuery();
                             resultSet=preparedStatement.getResultSet();
@@ -147,6 +148,7 @@ public class BattleScene {
                                     public void run() {
                                         if(gameResult.getFitHeight()>210){
                                             viewTimer.cancel();
+
                                         }
                                         gameResult.setX(gameResult.getX()-8);
                                         gameResult.setY(gameResult.getY()-7);
@@ -155,7 +157,7 @@ public class BattleScene {
                                     }
                                 };
                                 viewTimer.schedule(viewTask,0,100);
-
+                                GameEnded=true;
                                 resultTimer.cancel();
                             }
                         }
@@ -166,6 +168,17 @@ public class BattleScene {
             }
         };
         resultTimer.schedule(resultTask,3000,1000);
+
+        Timer endedTimer=new Timer();
+        TimerTask timerTask=new TimerTask() {
+            @Override
+            public void run() {
+                if(GameEnded){
+                    System.exit(0);
+                }
+            }
+        };
+        endedTimer.schedule(timerTask,3000,3000);
 
         ConveyorBelt conveyorBelt=new ConveyorBelt(gameStage);
         Timer timer=new Timer();
@@ -264,7 +277,7 @@ public class BattleScene {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        if(zoms_num<100){
+                        if(zoms_num<1){
                             switch (random_range.nextInt(4)){
                                 case 0:{
                                     zoms[zoms_num++]=new Normal_Zombie(random_row.nextInt(5)+1,1000,gameStage);
