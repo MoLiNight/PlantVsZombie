@@ -52,7 +52,7 @@ public class Jump_Zombie extends Zom{
         pane.getChildren().add(imageView);
         code = 4;
         try{
-            String sqlQuery = "update zombie_plant set isAbleToEat = ? where id = ?";
+            String sqlQuery = "update zombie_data set isAbleToEat = ? where id = ?";
             PreparedStatement pstmt = conn.prepareStatement(sqlQuery);
             pstmt.setInt(1, 0);
             pstmt.setInt(2, id);
@@ -111,6 +111,7 @@ public class Jump_Zombie extends Zom{
                 if((!cheak_run(row, col) || code == 5) && !isJump && alive){
                     code = 5;
                     imageView.setImage(image_jump);
+                    imageView.setY(imageView.getY()-40);
                     cnt += 1;
                     // 任务执行的代码
                     try {
@@ -132,12 +133,12 @@ public class Jump_Zombie extends Zom{
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                    pane.setTopAnchor(imageView, (double)(40 +(row - 1)* 95)); // 设置图片距离AnchorPane顶部的距离为50像素
+                    pane.setTopAnchor(imageView, (double)((row - 1)* 95)); // 设置图片距离AnchorPane顶部的距离为50像素
                     pane.setLeftAnchor(imageView, col - 40);// 设置图片距离AnchorPane左侧的距离为100像素
-                    if(cnt == 20) {
+                    if(cnt == 35) {
                         try {
                             isJump = true;
-                            col -= 40;
+                            col -= 80;
                             // 创建PreparedStatement对象
                             String sqlQuery = "update zombie_data set myrow = ?, mycol = ?, isAbleToEat = ? where id = ?";
                             PreparedStatement pstmt = conn.prepareStatement(sqlQuery);
@@ -174,6 +175,7 @@ public class Jump_Zombie extends Zom{
                 if(!cheak_eat(row, col) && alive && isJump){
                     if(code != 1){
                         imageView.setImage(image_walk);
+                        imageView.setY(imageView.getY()+40);
 
                         code = 1;
                     }
@@ -236,6 +238,7 @@ public class Jump_Zombie extends Zom{
                     }catch (SQLException e) {
                         e.printStackTrace();
                     }
+                    pane.setTopAnchor(imageView, (double)(5 +(row - 1)* 95)); // 设置图片距离AnchorPane顶部的距离为50像素
                     if(hp <= 0){
                         try{
                             String sqlQuery = "delete from plant_data where id = ?";
@@ -344,7 +347,7 @@ public class Jump_Zombie extends Zom{
             while(rs.next()){
                 double plant_col = rs.getDouble("mycol");
                 int plant_id = rs.getInt("id");
-                if(col - plant_col <= -5 && col - plant_col >= -15){
+                if(col - plant_col <= 35 && col - plant_col >= -15){
                     if(col - plant_col < _min){
                         _min = Math.abs(plant_col - col);
                         isRun = false;
@@ -370,7 +373,7 @@ public class Jump_Zombie extends Zom{
             while(rs.next()){
                 double plant_col = rs.getDouble("mycol");
                 int plant_id = rs.getInt("id");
-                if(Math.abs(plant_col - col) < 2){
+                if(plant_col - col < 115 && plant_col - col > 45){
                     if(Math.abs(plant_col - col) < _min){
                         _min = Math.abs(plant_col - col);
                         isEat = true;

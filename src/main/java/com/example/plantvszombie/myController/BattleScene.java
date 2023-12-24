@@ -175,7 +175,7 @@ public class BattleScene {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        switch (random_range.nextInt(4)){
+                        switch (random_range.nextInt(1)+2){
                             case 0:{
                                 zoms[zoms_num++]=new Normal_Zombie(random_row.nextInt(5)+1,1000,gameStage);
                                 break;

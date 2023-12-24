@@ -70,7 +70,7 @@ public class Flower extends Plant{
                     if(type == 1){
                         PreparedStatement statement = conn.prepareStatement("SELECT * FROM zombie_data WHERE myrow = ? and mycol < ? and mycol > ? and die_reason = 0 and isAbleToEat = 1");
                         statement.setInt(1, getRow()); // 使用 Flower 的行数进行查询
-                        statement.setDouble(2,getCol() + 90);
+                        statement.setDouble(2,getCol() + 100);
                         statement.setDouble(3,getCol());
 
                         ResultSet resultSet = statement.executeQuery();
