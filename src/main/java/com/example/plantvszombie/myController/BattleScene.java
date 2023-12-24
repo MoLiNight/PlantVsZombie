@@ -318,7 +318,7 @@ public class BattleScene {
                     @Override
                     public void run() {
                         if(zoms_num<100){
-                            switch (random_range.nextInt(1)+3){
+                            switch (random_range.nextInt(4)){
                                 case 0:{
                                     zoms[zoms_num++]=new Normal_Zombie(random_row.nextInt(5)+1,1000,gameStage);
                                     break;
