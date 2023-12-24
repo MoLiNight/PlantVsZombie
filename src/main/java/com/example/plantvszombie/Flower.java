@@ -68,44 +68,56 @@ public class Flower extends Plant{
                 try {
                     //如果处于等待的状态
                     if(type == 1){
-                        PreparedStatement statement = conn.prepareStatement("SELECT * FROM zombie_data WHERE myrow = ? and mycol < ? and mycol > ? and die_reason = 0 and isAbleToEat = 1");
-                        statement.setInt(1, getRow()); // 使用 Flower 的行数进行查询
-                        statement.setDouble(2,getCol() + 100);
-                        statement.setDouble(3,getCol());
+                        for(int T=1;T<=2;T++){
+                            PreparedStatement statement = conn.prepareStatement("SELECT * FROM zombie_data WHERE myrow = ? and mycol < ? and mycol > ? and die_reason = 0 and isAbleToEat = ?");
+                            statement.setInt(1, getRow()); // 使用 Flower 的行数进行查询
+                            if(T==1){
+                                statement.setDouble(2,getCol() + 100);
+                                statement.setDouble(3,getCol());
+                            }
+                            else{
+                                statement.setDouble(2,getCol() + 20);
+                                statement.setDouble(3,getCol() - 100);
+                            }
+                            statement.setInt(4,T);
 
-                        ResultSet resultSet = statement.executeQuery();
+                            ResultSet resultSet = statement.executeQuery();
 
-                        if (resultSet.next()) {
-                            PreparedStatement statement_1 = conn.prepareStatement("UPDATE zombie_data set die_reason = 1 WHERE id = ?");
-                            statement_1.setInt(1, resultSet.getInt(1));
+                            if (resultSet.next()) {
+                                PreparedStatement statement_1 = conn.prepareStatement("UPDATE zombie_data set die_reason = 1 WHERE id = ?");
+                                statement_1.setInt(1, resultSet.getInt(1));
 
-                            int rowsAffected  = statement_1.executeUpdate();
+                                int rowsAffected  = statement_1.executeUpdate();
 
-                            if (rowsAffected > 0) {
-                                System.out.println("Successfully deleted zombie information.");
-                            } else {
-                                System.out.println("No zombie information deleted.");
+                                if (rowsAffected > 0) {
+                                    System.out.println("Successfully deleted zombie information.");
+                                } else {
+                                    System.out.println("No zombie information deleted.");
+                                }
+
+                                statement_1.close();
+
+                                type = 2;
+                                viewgif.setImage(attackimage);
+
+                                //停留一段时间后切换图片
+                                Timer imageSwitchTimer = new Timer();
+                                imageSwitchTimer.schedule(new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        // 更改图片为 digestImage
+                                        viewgif.setImage(digestImage);
+                                        // ...其他操作
+                                    }
+                                }, 500);
                             }
 
-                            statement_1.close();
-
-                            type = 2;
-                            viewgif.setImage(attackimage);
-
-                            //停留一段时间后切换图片
-                            Timer imageSwitchTimer = new Timer();
-                            imageSwitchTimer.schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    // 更改图片为 digestImage
-                                    viewgif.setImage(digestImage);
-                                    // ...其他操作
-                                }
-                            }, 500);
+                            resultSet.close();
+                            statement.close();
+                            if(type==2){
+                                break;
+                            }
                         }
-
-                        resultSet.close();
-                        statement.close();
                     }
                     //如果处于消化的状态
                     else{

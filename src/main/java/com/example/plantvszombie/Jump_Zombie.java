@@ -146,7 +146,7 @@ public class Jump_Zombie extends Zom{
                             // 设置参数
                             pstmt.setInt(1, row); // 设置myrow
                             pstmt.setDouble(2, col); // 设置mycol
-                            pstmt.setInt(3,1);
+                            pstmt.setInt(3,2);
                             pstmt.setInt(4, id);
 
                             // 执行更新操作
@@ -347,7 +347,7 @@ public class Jump_Zombie extends Zom{
             while(rs.next()){
                 double plant_col = rs.getDouble("mycol");
                 int plant_id = rs.getInt("id");
-                if(col - plant_col <= 35 && col - plant_col >= -15){
+                if(col - plant_col <= 25 && col - plant_col >= -100){
                     if(col - plant_col < _min){
                         _min = Math.abs(plant_col - col);
                         isRun = false;
