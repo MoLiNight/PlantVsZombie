@@ -5,15 +5,21 @@ import javafx.animation.PathTransition;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.*;
 import java.util.Random;
 import java.util.Timer;
@@ -29,7 +35,7 @@ public class BattleScene {
     private ImageView backgroundImage;
 
     @FXML
-    private Button menuButton;
+    private Button exitButton;
 
     @FXML
     private ImageView shovelImage;
@@ -44,13 +50,16 @@ public class BattleScene {
     private ImageView startAnimation;
 
     @FXML
-    private ImageView failView;
+    private ImageView gameResult;
 
-    private int card_id=0;
+    @FXML
+    private Label resultNotice;
+
+    int card_id=0;
     private Connection connection;
 
     int zoms_num=0;
-    Zom[] zoms=new Zom[10000];
+    Zom[] zoms=new Zom[1000];
 
     public void initialize() throws SQLException {
         connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/GameDB?useSSL=false","root","Zxx20040806*");
@@ -74,18 +83,21 @@ public class BattleScene {
             images[i]=new Image(file[i].toURI().toString());
         }
 
+        resultNotice.setText("  Kill one hundred\nzombie to succeed");
+        resultNotice.setStyle("-fx-background-color: #FFFF77");
+        resultNotice.setFont(new Font(16));
+
         beltPane.setStyle("-fx-background-color: #444444");
         shovelBackground.setImage(images[0]);
         backgroundImage.setImage(images[1]);
-        menuButton.setBackground(new Background(new BackgroundImage(images[2],null,null,null,null)));
+        exitButton.setBackground(new Background(new BackgroundImage(images[2],null,null,null,null)));
         shovelImage.setImage(images[3]);
         startAnimation.setImage(images[11]);
-        failView.setImage(images[7]);
-        failView.setVisible(false);
+        gameResult.setVisible(false);
         SmallTrolley smallTrolley=new SmallTrolley(gameStage);
 
-        Timer failTimer=new Timer();
-        TimerTask failTask=new TimerTask() {
+        Timer resultTimer=new Timer();
+        TimerTask resultTask=new TimerTask() {
             @Override
             public void run() {
                 try {
@@ -94,35 +106,66 @@ public class BattleScene {
                     preparedStatement.executeQuery();
                     ResultSet resultSet=preparedStatement.getResultSet();
                     if(resultSet.next()){
-                        failView.setX(430);
-                        failView.setY(240);
-                        failView.setFitWidth(140);
-                        failView.setFitHeight(120);
-                        failView.setVisible(true);
-                        failView.toFront();
+                        gameResult.setImage(images[7]);
+                        gameResult.setX(430);
+                        gameResult.setY(240);
+                        gameResult.setFitWidth(140);
+                        gameResult.setFitHeight(120);
+                        gameResult.setVisible(true);
                         Timer viewTimer=new Timer();
                         TimerTask viewTask=new TimerTask() {
                             @Override
                             public void run() {
-                                if(failView.getFitHeight()>420){
+                                if(gameResult.getFitHeight()>420){
                                     viewTimer.cancel();
                                 }
-                                failView.setX(failView.getX()-14);
-                                failView.setY(failView.getY()-12);
-                                failView.setFitHeight(failView.getFitHeight()+24);
-                                failView.setFitWidth(failView.getFitWidth()+28);
+                                gameResult.setX(gameResult.getX()-14);
+                                gameResult.setY(gameResult.getY()-12);
+                                gameResult.setFitHeight(gameResult.getFitHeight()+24);
+                                gameResult.setFitWidth(gameResult.getFitWidth()+28);
                             }
                         };
                         viewTimer.schedule(viewTask,0,100);
 
-                        failTimer.cancel();
+                        resultTimer.cancel();
+                    }
+                    else{
+                        if(zoms_num>=100){
+                            preparedStatement=connection.prepareStatement("SELECT * FROM zombie_data",Statement.RETURN_GENERATED_KEYS);
+                            preparedStatement.executeQuery();
+                            resultSet=preparedStatement.getResultSet();
+                            if(!resultSet.next()){
+                                gameResult.setImage(images[6]);
+                                gameResult.setX(460);
+                                gameResult.setY(265);
+                                gameResult.setFitWidth(80);
+                                gameResult.setFitHeight(70);
+                                gameResult.setVisible(true);
+                                Timer viewTimer=new Timer();
+                                TimerTask viewTask=new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        if(gameResult.getFitHeight()>210){
+                                            viewTimer.cancel();
+                                        }
+                                        gameResult.setX(gameResult.getX()-8);
+                                        gameResult.setY(gameResult.getY()-7);
+                                        gameResult.setFitHeight(gameResult.getFitHeight()+14);
+                                        gameResult.setFitWidth(gameResult.getFitWidth()+16);
+                                    }
+                                };
+                                viewTimer.schedule(viewTask,0,100);
+
+                                resultTimer.cancel();
+                            }
+                        }
                     }
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
             }
         };
-        failTimer.schedule(failTask,3000,1000);
+        resultTimer.schedule(resultTask,3000,1000);
 
         ConveyorBelt conveyorBelt=new ConveyorBelt(gameStage);
         Timer timer=new Timer();
@@ -221,28 +264,37 @@ public class BattleScene {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        switch (random_range.nextInt(4)){
-                            case 0:{
-                                zoms[zoms_num++]=new Normal_Zombie(random_row.nextInt(5)+1,1000,gameStage);
-                                break;
+                        if(zoms_num<100){
+                            switch (random_range.nextInt(4)){
+                                case 0:{
+                                    zoms[zoms_num++]=new Normal_Zombie(random_row.nextInt(5)+1,1000,gameStage);
+                                    break;
+                                }
+                                case 1:{
+                                    zoms[zoms_num++]=new Icon_Zombie(random_row.nextInt(5)+1,1000,gameStage);
+                                    break;
+                                }
+                                case 2:{
+                                    zoms[zoms_num++]=new Jump_Zombie(random_row.nextInt(5)+1,1000,gameStage);
+                                    break;
+                                }
+                                case 3:{
+                                    zoms[zoms_num++]=new IceCar_Zombie(random_row.nextInt(5)+1,1000,gameStage);
+                                    break;
+                                }
                             }
-                            case 1:{
-                                zoms[zoms_num++]=new Icon_Zombie(random_row.nextInt(5)+1,1000,gameStage);
-                                break;
-                            }
-                            case 2:{
-                                zoms[zoms_num++]=new Jump_Zombie(random_row.nextInt(5)+1,1000,gameStage);
-                                break;
-                            }
-                            case 3:{
-                                zoms[zoms_num++]=new IceCar_Zombie(random_row.nextInt(5)+1,1000,gameStage);
-                                break;
-                            }
+                        }
+                        else{
+                            zom_timer.cancel();
                         }
                     }
                 });
             }
         };
         zom_timer.schedule(zom_task,3000,2500);
+    }
+
+    public void exitGame() throws IOException {
+        System.exit(0);
     }
 }
