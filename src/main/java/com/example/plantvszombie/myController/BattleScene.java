@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -55,6 +56,9 @@ public class BattleScene {
     @FXML
     private Label resultNotice;
 
+    @FXML
+    private Label progressLabel;
+
     int card_id=0;
     private Connection connection;
     int zoms_num=0;
@@ -87,6 +91,10 @@ public class BattleScene {
         resultNotice.setStyle("-fx-background-color: #FFFF77");
         resultNotice.setFont(new Font(16));
 
+        progressLabel.setStyle("-fx-background-color: #FFFF77");
+        progressLabel.setFont(new Font(16));
+        progressLabel.setAlignment(Pos.CENTER);
+
         beltPane.setStyle("-fx-background-color: #444444");
         shovelBackground.setImage(images[0]);
         backgroundImage.setImage(images[1]);
@@ -96,75 +104,107 @@ public class BattleScene {
         gameResult.setVisible(false);
         SmallTrolley smallTrolley=new SmallTrolley(gameStage);
 
+        Timer labelTimer=new Timer();
+        TimerTask labelTask=new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        int alive_num=0;
+                        try {
+                            Statement statement=connection.createStatement();
+                            statement.executeQuery("SELECT * FROM zombie_data");
+                            ResultSet resultSet=statement.getResultSet();
+                            while (resultSet.next()){
+                                alive_num++;
+                            }
+                            progressLabel.setText("当前进度:"+(zoms_num-alive_num)+"/100");
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+            }
+        };
+        labelTimer.schedule(labelTask,3000,500);
+
+
         Timer resultTimer=new Timer();
         TimerTask resultTask=new TimerTask() {
             @Override
             public void run() {
-                try {
-                    PreparedStatement preparedStatement=connection.prepareStatement("SELECT * FROM zombie_data WHERE mycol < ?",Statement.RETURN_GENERATED_KEYS);
-                    preparedStatement.setDouble(1,0);
-                    preparedStatement.executeQuery();
-                    ResultSet resultSet=preparedStatement.getResultSet();
-                    if(resultSet.next()){
-                        gameResult.setImage(images[7]);
-                        gameResult.setX(430);
-                        gameResult.setY(240);
-                        gameResult.setFitWidth(140);
-                        gameResult.setFitHeight(120);
-                        gameResult.setVisible(true);
-                        Timer viewTimer=new Timer();
-                        TimerTask viewTask=new TimerTask() {
-                            @Override
-                            public void run() {
-                                if(gameResult.getFitHeight()>420){
-                                    viewTimer.cancel();
-                                }
-                                gameResult.setX(gameResult.getX()-14);
-                                gameResult.setY(gameResult.getY()-12);
-                                gameResult.setFitHeight(gameResult.getFitHeight()+24);
-                                gameResult.setFitWidth(gameResult.getFitWidth()+28);
-                            }
-                        };
-                        viewTimer.schedule(viewTask,0,100);
-
-                        GameEnded=true;
-                        resultTimer.cancel();
-                    }
-                    else{
-                        if(zoms_num>=1){
-                            preparedStatement=connection.prepareStatement("SELECT * FROM zombie_data",Statement.RETURN_GENERATED_KEYS);
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            PreparedStatement preparedStatement=connection.prepareStatement("SELECT * FROM zombie_data WHERE mycol < ?",Statement.RETURN_GENERATED_KEYS);
+                            preparedStatement.setDouble(1,0);
                             preparedStatement.executeQuery();
-                            resultSet=preparedStatement.getResultSet();
-                            if(!resultSet.next()){
-                                gameResult.setImage(images[6]);
-                                gameResult.setX(460);
-                                gameResult.setY(265);
-                                gameResult.setFitWidth(80);
-                                gameResult.setFitHeight(70);
+                            ResultSet resultSet=preparedStatement.getResultSet();
+                            if(resultSet.next()){
+                                gameResult.setImage(images[7]);
+                                gameResult.toFront();
+                                gameResult.setX(430);
+                                gameResult.setY(240);
+                                gameResult.setFitWidth(140);
+                                gameResult.setFitHeight(120);
                                 gameResult.setVisible(true);
                                 Timer viewTimer=new Timer();
                                 TimerTask viewTask=new TimerTask() {
                                     @Override
                                     public void run() {
-                                        if(gameResult.getFitHeight()>210){
+                                        if(gameResult.getFitHeight()>420){
                                             viewTimer.cancel();
-
                                         }
-                                        gameResult.setX(gameResult.getX()-8);
-                                        gameResult.setY(gameResult.getY()-7);
-                                        gameResult.setFitHeight(gameResult.getFitHeight()+14);
-                                        gameResult.setFitWidth(gameResult.getFitWidth()+16);
+                                        gameResult.setX(gameResult.getX()-14);
+                                        gameResult.setY(gameResult.getY()-12);
+                                        gameResult.setFitHeight(gameResult.getFitHeight()+24);
+                                        gameResult.setFitWidth(gameResult.getFitWidth()+28);
                                     }
                                 };
                                 viewTimer.schedule(viewTask,0,100);
+
                                 GameEnded=true;
                                 resultTimer.cancel();
                             }
+                            else{
+                                if(zoms_num>=100){
+                                    preparedStatement=connection.prepareStatement("SELECT * FROM zombie_data",Statement.RETURN_GENERATED_KEYS);
+                                    preparedStatement.executeQuery();
+                                    resultSet=preparedStatement.getResultSet();
+                                    if(!resultSet.next()){
+                                        gameResult.setImage(images[6]);
+                                        gameResult.toFront();
+                                        gameResult.setX(460);
+                                        gameResult.setY(265);
+                                        gameResult.setFitWidth(80);
+                                        gameResult.setFitHeight(70);
+                                        gameResult.setVisible(true);
+                                        Timer viewTimer=new Timer();
+                                        TimerTask viewTask=new TimerTask() {
+                                            @Override
+                                            public void run() {
+                                                if(gameResult.getFitHeight()>210){
+                                                    viewTimer.cancel();
+                                                }
+                                                gameResult.setX(gameResult.getX()-8);
+                                                gameResult.setY(gameResult.getY()-7);
+                                                gameResult.setFitHeight(gameResult.getFitHeight()+14);
+                                                gameResult.setFitWidth(gameResult.getFitWidth()+16);
+                                            }
+                                        };
+                                        viewTimer.schedule(viewTask,0,100);
+                                        GameEnded=true;
+                                        resultTimer.cancel();
+                                    }
+                                }
+                            }
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
                         }
                     }
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
+                });
             }
         };
         resultTimer.schedule(resultTask,3000,1000);
@@ -206,7 +246,7 @@ public class BattleScene {
                 });
             }
         };
-        timer.schedule(task,3000,2500);
+        timer.schedule(task,3000,3000);
 
         double shovelX=shovelImage.getX();
         double shovelY=shovelImage.getY();
@@ -277,8 +317,8 @@ public class BattleScene {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        if(zoms_num<1){
-                            switch (random_range.nextInt(4)){
+                        if(zoms_num<100){
+                            switch (random_range.nextInt(1)+3){
                                 case 0:{
                                     zoms[zoms_num++]=new Normal_Zombie(random_row.nextInt(5)+1,1000,gameStage);
                                     break;
@@ -304,7 +344,7 @@ public class BattleScene {
                 });
             }
         };
-        zom_timer.schedule(zom_task,3000,2500);
+        zom_timer.schedule(zom_task,3000,1500);
     }
 
     public void exitGame() throws IOException {

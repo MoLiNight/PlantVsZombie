@@ -33,5 +33,6 @@
       </ImageView>
       <ImageView fx:id="gameResult" fitHeight="480.0" fitWidth="560.0" pickOnBounds="true" preserveRatio="true" x="500.0" y="60.0" />
       <Label fx:id="resultNotice" layoutX="25.0" layoutY="15.0" prefHeight="40.0" prefWidth="150.0" />
+      <Label fx:id="progressLabel" layoutX="850.0" layoutY="560.0" prefHeight="30.0" prefWidth="135.0" />
    </children>
 </AnchorPane>

@@ -72,11 +72,11 @@ public class ConveyorBelt {
         ImageView imageView=new ImageView();
         Random random=new Random();
         int rand=random.nextInt(100);
-        if(rand<50){
+        if(rand<60){
             imageView.setImage(images[0]);
         }
         else
-            if(rand<85){
+            if(rand<90){
                 imageView.setImage(images[1]);
             }
             else{

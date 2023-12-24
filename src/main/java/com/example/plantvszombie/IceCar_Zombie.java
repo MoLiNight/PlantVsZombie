@@ -195,7 +195,7 @@ public class IceCar_Zombie extends Zom{
             while(rs.next()){
                 double plant_col = rs.getDouble("mycol");
                 int plant_id = rs.getInt("id");
-                if(Math.abs(plant_col - col) < 10){
+                if(plant_col - col > -10 && plant_col - col < 190){
                     if(Math.abs(plant_col - col) < _min){
                         _min = Math.abs(plant_col - col);
                         isEat = true;
