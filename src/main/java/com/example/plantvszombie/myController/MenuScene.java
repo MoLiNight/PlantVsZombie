@@ -16,6 +16,9 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.*;
@@ -36,6 +39,12 @@ public class MenuScene {
     }
 
     public void GameStart() throws Exception {
+        Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/GameDB?useSSL=false","root","Zxx20040806*");
+        Statement statement=connection.createStatement();
+        statement.executeUpdate("TRUNCATE TABLE card_data");
+        statement.executeUpdate("TRUNCATE TABLE plant_data");
+        statement.executeUpdate("TRUNCATE TABLE zombie_data");
+
         FXMLLoader loader=new FXMLLoader(Main.class.getResource("BattleScene.fxml"));
         Stage pre_stage=(Stage)startButton.getScene().getWindow();
         pre_stage.close();

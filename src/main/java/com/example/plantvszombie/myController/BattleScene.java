@@ -43,6 +43,9 @@ public class BattleScene {
     @FXML
     private ImageView startAnimation;
 
+    @FXML
+    private ImageView failView;
+
     private int card_id=0;
     private Connection connection;
 
@@ -77,7 +80,49 @@ public class BattleScene {
         menuButton.setBackground(new Background(new BackgroundImage(images[2],null,null,null,null)));
         shovelImage.setImage(images[3]);
         startAnimation.setImage(images[11]);
+        failView.setImage(images[7]);
+        failView.setVisible(false);
         SmallTrolley smallTrolley=new SmallTrolley(gameStage);
+
+        Timer failTimer=new Timer();
+        TimerTask failTask=new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    PreparedStatement preparedStatement=connection.prepareStatement("SELECT * FROM zombie_data WHERE mycol < ?",Statement.RETURN_GENERATED_KEYS);
+                    preparedStatement.setDouble(1,0);
+                    preparedStatement.executeQuery();
+                    ResultSet resultSet=preparedStatement.getResultSet();
+                    if(resultSet.next()){
+                        failView.setX(430);
+                        failView.setY(240);
+                        failView.setFitWidth(140);
+                        failView.setFitHeight(120);
+                        failView.setVisible(true);
+                        failView.toFront();
+                        Timer viewTimer=new Timer();
+                        TimerTask viewTask=new TimerTask() {
+                            @Override
+                            public void run() {
+                                if(failView.getFitHeight()>420){
+                                    viewTimer.cancel();
+                                }
+                                failView.setX(failView.getX()-14);
+                                failView.setY(failView.getY()-12);
+                                failView.setFitHeight(failView.getFitHeight()+24);
+                                failView.setFitWidth(failView.getFitWidth()+28);
+                            }
+                        };
+                        viewTimer.schedule(viewTask,0,100);
+
+                        failTimer.cancel();
+                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        failTimer.schedule(failTask,3000,1000);
 
         ConveyorBelt conveyorBelt=new ConveyorBelt(gameStage);
         Timer timer=new Timer();

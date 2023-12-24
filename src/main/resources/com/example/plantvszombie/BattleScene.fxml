@@ -31,5 +31,6 @@
             <Image url="@../../../images/ReadyToStart.gif" />
          </image>
       </ImageView>
+      <ImageView fx:id="failView" fitHeight="480.0" fitWidth="560.0" pickOnBounds="true" preserveRatio="true" x="500.0" y="60.0" />
    </children>
 </AnchorPane>
