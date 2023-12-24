@@ -48,7 +48,7 @@ public class Zom {
         this.anchorPane = pane;
 
         try {
-            String sqlQuery = "insert into zombie_data(id, myrow, mycol, die_reason) values(?, ?, ?, ?)";
+            String sqlQuery = "insert into zombie_data(id, myrow, mycol, die_reason, isAbleToEat) values(?, ?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sqlQuery);
 
             // 设置参数
@@ -56,6 +56,7 @@ public class Zom {
             pstmt.setInt(2, row); // 设置myrow
             pstmt.setDouble(3, col); // 设置mycol
             pstmt.setInt(4, 0);
+            pstmt.setInt(5, 1);
             // 执行更新操作
             pstmt.executeUpdate();
 

@@ -51,6 +51,16 @@ public class Jump_Zombie extends Zom{
         imageView.setImage(image_run);
         pane.getChildren().add(imageView);
         code = 4;
+        try{
+            String sqlQuery = "update zombie_plant set isAbleToEat = ? where id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sqlQuery);
+            pstmt.setInt(1, 0);
+            pstmt.setInt(2, id);
+            pstmt.executeUpdate();
+            pstmt.close();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
         Run(pane, imageView);
         Jump(pane, imageView);
         walk(pane, imageView);
@@ -128,15 +138,15 @@ public class Jump_Zombie extends Zom{
                         try {
                             isJump = true;
                             col -= 40;
-                            System.out.println(col);
                             // 创建PreparedStatement对象
-                            String sqlQuery = "update zombie_data set myrow = ?, mycol = ? where id = ?";
+                            String sqlQuery = "update zombie_data set myrow = ?, mycol = ?, isAbleToEat = ? where id = ?";
                             PreparedStatement pstmt = conn.prepareStatement(sqlQuery);
 
                             // 设置参数
                             pstmt.setInt(1, row); // 设置myrow
                             pstmt.setDouble(2, col); // 设置mycol
-                            pstmt.setInt(3, id);
+                            pstmt.setInt(3,1);
+                            pstmt.setInt(4, id);
 
                             // 执行更新操作
                             pstmt.executeUpdate();
@@ -307,8 +317,6 @@ public class Jump_Zombie extends Zom{
                         alive = false;
                     }else if(die_reason == 2){
                         imageView.setImage(image_die);
-                        imageView.setFitWidth(120);
-                        imageView.setFitHeight(145);
                         alive = false;
                         try {
                             Thread.sleep(500);  // 暂停执行 5 秒钟（5000 毫秒）
