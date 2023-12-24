@@ -77,6 +77,7 @@ public class BattleScene {
         menuButton.setBackground(new Background(new BackgroundImage(images[2],null,null,null,null)));
         shovelImage.setImage(images[3]);
         startAnimation.setImage(images[11]);
+        SmallTrolley smallTrolley=new SmallTrolley(gameStage);
 
         ConveyorBelt conveyorBelt=new ConveyorBelt(gameStage);
         Timer timer=new Timer();
@@ -175,7 +176,7 @@ public class BattleScene {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        switch (random_range.nextInt(1)+2){
+                        switch (random_range.nextInt(4)){
                             case 0:{
                                 zoms[zoms_num++]=new Normal_Zombie(random_row.nextInt(5)+1,1000,gameStage);
                                 break;
