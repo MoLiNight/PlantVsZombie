@@ -1,5 +1,6 @@
 package com.example.plantvszombie;
 
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -80,7 +81,12 @@ public class SmallTrolley {
             };
             timer.schedule(timerTask,0,100);
 
-            anchorPane.getChildren().add(imageView);
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    anchorPane.getChildren().add(imageView);
+                }
+            });
         }
     }
 }

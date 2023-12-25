@@ -51,7 +51,6 @@ public class Flower extends Plant{
         viewgif.setX(col);
         viewgif.setY(70 +(row - 1)* 95);
         parentPane.getChildren().add(viewgif);
-
         viewgif.setImage(waitimage);
 
         startMonitoringZombies();

@@ -1,5 +1,6 @@
 package com.example.plantvszombie;
 
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -49,7 +50,13 @@ public class Jump_Zombie extends Zom{
         imageView.setFitWidth(280);
         imageView.setFitHeight(200);
         imageView.setImage(image_run);
-        pane.getChildren().add(imageView);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                pane.getChildren().add(imageView);
+            }
+        });
+
         code = 4;
         try{
             String sqlQuery = "update zombie_data set isAbleToEat = ? where id = ?";

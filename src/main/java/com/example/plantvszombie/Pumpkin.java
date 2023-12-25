@@ -40,7 +40,13 @@ public class Pumpkin extends Plant{
 
         viewgif.toFront();
 
-        parentPane.getChildren().add(viewgif);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                parentPane.getChildren().add(viewgif);
+            }
+        });
+
         viewgif.toFront();
 
         viewgif.setImage(fullHP);

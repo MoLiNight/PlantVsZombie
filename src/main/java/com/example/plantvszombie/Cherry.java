@@ -41,7 +41,12 @@ public class Cherry extends Plant{
 
         viewgif.setX(col);
         viewgif.setY(105 +(row - 1)* 95);
-        parentPane.getChildren().add(viewgif);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                parentPane.getChildren().add(viewgif);
+            }
+        });
 
         viewgif.setImage(cherry);
         Timer imageSwitchTimer = new Timer();

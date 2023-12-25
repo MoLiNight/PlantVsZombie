@@ -1,5 +1,6 @@
 package com.example.plantvszombie;
 
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -35,7 +36,13 @@ public class Normal_Zombie extends Zom{
         imageView.setFitWidth(120);
         imageView.setFitHeight(145);
         imageView.setImage(image_walk);
-        pane.getChildren().add(imageView);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                pane.getChildren().add(imageView);
+            }
+        });
+
         code = 1;
         walk(pane, imageView);
         eat(pane, imageView);

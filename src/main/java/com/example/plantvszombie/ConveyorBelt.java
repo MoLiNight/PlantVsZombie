@@ -212,7 +212,13 @@ public class ConveyorBelt {
             }
         });
 
-        pane.getChildren().add(imageView);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                pane.getChildren().add(imageView);
+            }
+        });
+        //pane.getChildren().add(imageView);
 
         Timer timer=new Timer();
         TimerTask timerTask=new TimerTask() {
