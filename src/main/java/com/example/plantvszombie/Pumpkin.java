@@ -77,6 +77,20 @@ public class Pumpkin extends Plant{
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }
+                } else if (currentHP <= 1111) {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            viewgif.setImage(new Image(new File("src/main/resources/images/Pumpkin_Three.gif").toURI().toString()));
+                        }
+                    });
+                } else if (currentHP <= 2222) {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            viewgif.setImage(new Image(new File("src/main/resources/images/Pumpkin_Two.gif").toURI().toString()));
+                        }
+                    });
                 }
             }
         }, 0, 500); // 每秒执行一次检查操作，可以根据需要调整时间间隔
