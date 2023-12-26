@@ -57,7 +57,10 @@ public class SmallTrolley {
                                             try {
                                                 imageView.setX(imageView.getX()+25);
                                                 if(imageView.getX()>1000){
-                                                    imageView.setVisible(false);
+                                                    Platform.runLater(() -> {
+                                                        // 在 JavaFX 应用程序线程上执行与 JavaFX 场景图相关的操作
+                                                        pane.getChildren().remove(imageView);
+                                                    });
                                                     timer_attack.cancel();
                                                 }
                                                 PreparedStatement statement=connection.prepareStatement("UPDATE zombie_data SET die_reason = 2 WHERE myrow = ? AND mycol < ?",Statement.RETURN_GENERATED_KEYS);

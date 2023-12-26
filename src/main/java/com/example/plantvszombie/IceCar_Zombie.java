@@ -184,7 +184,10 @@ public class IceCar_Zombie extends Zom{
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        imageView.setImage(null);
+                        Platform.runLater(() -> {
+                            // 在 JavaFX 应用程序线程上执行与 JavaFX 场景图相关的操作
+                            pane.getChildren().remove(imageView);
+                        });
                     }
                 }
             }

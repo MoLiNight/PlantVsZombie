@@ -38,6 +38,7 @@ public class ConveyorBelt {
     File[] files=new File[10];
     Image[] images=new Image[10];
     public Plant[] plants=new Plant[1000];
+    boolean flag=false;
 
     public ConveyorBelt(AnchorPane pane) throws SQLException {
         connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/GameDB?useSSL=false","root","Zxx20040806*");
@@ -92,6 +93,7 @@ public class ConveyorBelt {
             int delX=0,delY=0;
             @Override
             public void handle(MouseEvent mouseEvent) {
+                flag=true;
                 if (imageView.getImage() == images[0]) {
                     imageView.setImage(images[3]);
                     delX=40;
@@ -123,91 +125,97 @@ public class ConveyorBelt {
         imageView.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                int putX=1,putY=1;
-                int frontX=0,frontY=0;
-                int minX=1920,minY=1080;
-                if(imageView.getImage()==images[3]){
-                    frontX=0;
-                    frontY=70;
-                }
-                if(imageView.getImage()==images[4]){
-                    frontX=5;
-                    frontY=120;
-                }
-                if(imageView.getImage()==images[5]){
-                    frontX=-15;
-                    frontY=105;
-                }
-
-                int IX=(int)imageView.getX();
-                int IY=(int)imageView.getY();
-
-                for(int r=1;r<=5;r++){
-                    int disY=Math.abs(IY-frontY-(r-1)*95);
-                    if(disY<minX){
-                        minX=disY;
-                        putY=r;
+                if(flag) {
+                    int putX=1,putY=1;
+                    int frontX=0,frontY=0;
+                    int minX=1920,minY=1080;
+                    if(imageView.getImage()==images[3]){
+                        frontX=0;
+                        frontY=70;
                     }
-                }
-
-                for(int c=1;c<=9;c++){
-                    int disX=Math.abs(IX-frontX-(c+1)*80);
-                    if(disX<minY){
-                        minY=disX;
-                        putX=c;
+                    if(imageView.getImage()==images[4]){
+                        frontX=5;
+                        frontY=120;
                     }
-                }
+                    if(imageView.getImage()==images[5]){
+                        frontX=-15;
+                        frontY=105;
+                    }
 
-                //imageView.setX(frontX+(putX+1)*80);
-                //imageView.setY(frontY+(putY-1)*95);
-                imageView.setVisible(false);
+                    int IX=(int)imageView.getX();
+                    int IY=(int)imageView.getY();
 
-                try {
-                    PreparedStatement preparedStatement=connection.prepareStatement("SELECT * FROM plant_data WHERE myrow = ? AND mycol = ?",Statement.RETURN_GENERATED_KEYS);
-                    preparedStatement.setInt(1,putY);
-                    preparedStatement.setInt(2,frontX+(putX+1)*80);
-                    preparedStatement.executeQuery();
-                    ResultSet resultSet=preparedStatement.getResultSet();
+                    for(int r=1;r<=5;r++){
+                        int disY=Math.abs(IY-frontY-(r-1)*95);
+                        if(disY<minX){
+                            minX=disY;
+                            putY=r;
+                        }
+                    }
 
-                    switch (frontX){
-                        case 0:{
-                            if(resultSet.next()){
-                                System.out.println("The Card has been destroyed");
+                    for(int c=1;c<=9;c++){
+                        int disX=Math.abs(IX-frontX-(c+1)*80);
+                        if(disX<minY){
+                            minY=disX;
+                            putX=c;
+                        }
+                    }
+
+                    //imageView.setX(frontX+(putX+1)*80);
+                    //imageView.setY(frontY+(putY-1)*95);
+                    Platform.runLater(() -> {
+                        // 在 JavaFX 应用程序线程上执行与 JavaFX 场景图相关的操作
+                        pane.getChildren().remove(imageView);
+                    });
+
+                    try {
+                        PreparedStatement preparedStatement=connection.prepareStatement("SELECT * FROM plant_data WHERE myrow = ? AND mycol = ?",Statement.RETURN_GENERATED_KEYS);
+                        preparedStatement.setInt(1,putY);
+                        preparedStatement.setInt(2,frontX+(putX+1)*80);
+                        preparedStatement.executeQuery();
+                        ResultSet resultSet=preparedStatement.getResultSet();
+
+                        switch (frontX){
+                            case 0:{
+                                if(resultSet.next()){
+                                    System.out.println("The Card has been destroyed");
+                                    break;
+                                }
+
+                                Flower flower=new Flower(putY,frontX+(putX+1)*80,anchorPane);
+                                plants[flower.id]=flower;
+
+                                preparedStatement.setInt(2,frontX+5+(putX+1)*80);
+                                preparedStatement.executeQuery();
+                                resultSet=preparedStatement.getResultSet();
+                                if(resultSet.next()){
+                                    Pumpkin pumpkin= (Pumpkin) plants[resultSet.getInt(1)];
+                                    pumpkin.viewgif.toFront();
+                                }
                                 break;
                             }
+                            case 5:{
+                                if(resultSet.next()){
+                                    System.out.println("The Card has been destroyed");
+                                    break;
+                                }
 
-                            Flower flower=new Flower(putY,frontX+(putX+1)*80,anchorPane);
-                            plants[flower.id]=flower;
-
-                            preparedStatement.setInt(2,frontX+5+(putX+1)*80);
-                            preparedStatement.executeQuery();
-                            resultSet=preparedStatement.getResultSet();
-                            if(resultSet.next()){
-                                Pumpkin pumpkin= (Pumpkin) plants[resultSet.getInt(1)];
-                                pumpkin.viewgif.toFront();
-                            }
-                            break;
-                        }
-                        case 5:{
-                            if(resultSet.next()){
-                                System.out.println("The Card has been destroyed");
+                                Pumpkin pumpkin=new Pumpkin(putY,frontX+(putX+1)*80,anchorPane);
+                                plants[pumpkin.id]=pumpkin;
                                 break;
                             }
+                            case -15:{
 
-                            Pumpkin pumpkin=new Pumpkin(putY,frontX+(putX+1)*80,anchorPane);
-                            plants[pumpkin.id]=pumpkin;
-                            break;
+                                Cherry cherry=new Cherry(putY,frontX+(putX+1)*80,anchorPane);
+                                plants[cherry.id]=cherry;
+                                break;
+                            }
                         }
-                        case -15:{
-
-                            Cherry cherry=new Cherry(putY,frontX+(putX+1)*80,anchorPane);
-                            plants[cherry.id]=cherry;
-                            break;
-                        }
+                        DeleteCard(card_id);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
                     }
-                    DeleteCard(card_id);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
+                    flag=false;
                 }
             }
         });

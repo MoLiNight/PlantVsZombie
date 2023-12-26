@@ -116,9 +116,11 @@ public class Jump_Zombie extends Zom{
             @Override
             public void run() {
                 if((!cheak_run(row, col) || code == 5) && !isJump && alive){
+                    if(code != 5){
+                        imageView.setImage(image_jump);
+                        imageView.setY(imageView.getY()-40);
+                    }
                     code = 5;
-                    imageView.setImage(image_jump);
-                    imageView.setY(imageView.getY()-40);
                     cnt += 1;
                     // 任务执行的代码
                     try {
@@ -140,7 +142,7 @@ public class Jump_Zombie extends Zom{
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                    pane.setTopAnchor(imageView, (double)((row - 1)* 95)); // 设置图片距离AnchorPane顶部的距离为50像素
+
                     pane.setLeftAnchor(imageView, col - 40);// 设置图片距离AnchorPane左侧的距离为100像素
                     if(cnt == 35) {
                         try {
@@ -164,14 +166,13 @@ public class Jump_Zombie extends Zom{
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
-                        pane.setTopAnchor(imageView, (double)(40 +(row - 1)* 95)); // 设置图片距离AnchorPane顶部的距离为50像素
                         pane.setLeftAnchor(imageView, col - 40);// 设置图片距离AnchorPane左侧的距离为100像素
                     }
                 }
             }
         };
 
-        timer.schedule(task, 0, 75);
+        timer.schedule(task, 0, 10);
 
     }
     public void walk(AnchorPane pane, ImageView imageView){
@@ -183,7 +184,6 @@ public class Jump_Zombie extends Zom{
                     if(code != 1){
                         imageView.setImage(image_walk);
                         imageView.setY(imageView.getY()+40);
-
                         code = 1;
                     }
                     // 任务执行的代码
@@ -323,7 +323,10 @@ public class Jump_Zombie extends Zom{
                         }
                     }
                     if(die_reason == 1 && isJump){
-                        imageView.setImage(null);
+                        Platform.runLater(() -> {
+                            // 在 JavaFX 应用程序线程上执行与 JavaFX 场景图相关的操作
+                            pane.getChildren().remove(imageView);
+                        });
                         alive = false;
                     }else if(die_reason == 2){
                         imageView.setImage(image_die);
@@ -333,7 +336,10 @@ public class Jump_Zombie extends Zom{
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        imageView.setImage(null);
+                        Platform.runLater(() -> {
+                            // 在 JavaFX 应用程序线程上执行与 JavaFX 场景图相关的操作
+                            pane.getChildren().remove(imageView);
+                        });
                     }
                 }
             }
